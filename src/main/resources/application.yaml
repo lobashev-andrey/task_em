@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: task_em
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+  datasource:
+    url: jdbc:postgresql://localhost:5433/task_db
+    username: postgres
+    password: postgres
+    hikari:
+      schema: task_schema
+      connection-init-sql: CREATE SCHEMA IF NOT EXISTS task_schema
+      connection-timeout: 10000
+app:
+  jwt:
+    secret: someSecretKey
+    tokenExpiration: 3m
+    refreshTokenExpiation: 30m
