@@ -25,9 +25,20 @@ public class User {
 
     private String email;
 
+    private String password;
+
+    @ElementCollection(targetClass = RoleType.class, fetch = FetchType.EAGER)
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "roles", nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    @Builder.Default
+    private Set<RoleType> roles = new HashSet<>();
+
+    @Builder.Default
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private Set<Task> createdTasks = new HashSet<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "performer", cascade = CascadeType.ALL)
     private Set<Task> assignedTasks = new HashSet<>();
 }

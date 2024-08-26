@@ -1,5 +1,8 @@
 package com.example.task_em.dto;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,9 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CommentRequest {
 
-    private Long userId;
-
+    @NotNull(message = "Укажите id задачи")
     private Long taskId;
 
+    @NotEmpty(message = "Поле текста комментария не должно быть пустым")
     private String text;
 }

@@ -10,6 +10,10 @@ public interface UserService {
 
     User findById(Long id);
 
-    User create(User user);
+    User findByUsername(String username);
 
+    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
+
+    User create(User user);
 }

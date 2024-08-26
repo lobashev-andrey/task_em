@@ -13,16 +13,20 @@ public class UserMapper {
 
     public User requestToUser(UserRequest request) {
         return User.builder()
-                .username(request.getName())
+                .username(request.getUsername())
                 .email(request.getEmail())
+                .password(request.getPassword())
                 .build();
     }
 
     public UserResponse userToResponse (User user) {
+
         return new UserResponse(
                 user.getId(),
                 user.getUsername(),
-                user.getEmail()
+                user.getEmail(),
+                user.getPassword(),
+                user.getRoles().stream().toList().get(0).name()
         );
     }
 

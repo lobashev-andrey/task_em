@@ -1,6 +1,7 @@
 package com.example.task_em.service;
 
 import com.example.task_em.entity.Task;
+import com.example.task_em.entity.User;
 
 import java.util.List;
 
@@ -10,9 +11,9 @@ public interface TaskService {
 
     Task findById(Long id);
 
-    List<Task> findByAuthorId(Long userId);
+    List<Task> findByAuthor(User author);
 
-    List<Task> findByPerformerId(Long userId);
+    List<Task> findByPerformer(User performer);
 
     Task create(Task task);
 

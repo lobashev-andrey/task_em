@@ -15,12 +15,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentMapper {
 
-    private final UserService userService;
     private final TaskService taskService;
 
     public Comment requestToComment(CommentRequest request) {
         return Comment.builder()
-                .user(userService.findById(request.getUserId()))
                 .task(taskService.findById(request.getTaskId()))
                 .text(request.getText())
                 .build();
