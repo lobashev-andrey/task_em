@@ -4,15 +4,22 @@ import com.example.task_em.dto.TaskRequest;
 import com.example.task_em.dto.TaskResponse;
 import com.example.task_em.dto.TaskResponseList;
 import com.example.task_em.entity.Task;
+import com.example.task_em.filter.TaskFilter;
 import com.example.task_em.mapper.TaskMapper;
 import com.example.task_em.service.TaskService;
 import com.example.task_em.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
@@ -21,6 +28,11 @@ import java.util.Objects;
 @Slf4j
 @RequestMapping("/task")
 @RequiredArgsConstructor
+@Tags({
+        @Tag(name = "Task controller", description = "Task controller version 1.0") ,
+        @Tag(name = "task")
+})
+
 public class TaskController {
 
     private final TaskService taskService;
@@ -28,38 +40,82 @@ public class TaskController {
     private final UserService userService;
 
 
+    @Operation(
+            summary = "Get tasks",
+            description = "Get all tasks (first page by default)",
+            tags = "filter"
+    )
     @GetMapping
-    public TaskResponseList getAllTasks() {
+    public TaskResponseList getAll(TaskFilter filter) {
         log.info("getAllTasks()  is called");
 
-        return taskMapper.taskListToResponseList(
-                taskService.findAll());
+        return filterBy(filter);
     }
 
+    @Tag(name = "id")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "get task by id",
+                    content = {
+                            @Content(schema = @Schema(implementation = TaskResponse.class),
+                                    mediaType = "application/json")
+                    }),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "task not found",
+                    content = {
+                            @Content(schema = @Schema(implementation = String.class),
+                            mediaType = "application/json")
+                    })
+    })
     @GetMapping("/{id}")
-    public TaskResponse getTaskById(@PathVariable Long id) {
+    public TaskResponse getById(@PathVariable Long id) {
         log.info("getTaskById() is called");
 
         return taskMapper.taskToResponse(
                 taskService.findById(id));
     }
 
-    @GetMapping("/author/{userId}")
-    public TaskResponseList getAllByAuthor(@PathVariable Long userId) {
-        log.info("getAllByAuthor() is called");
+
+    @Operation(
+            summary = "Get tasks by filter",
+            description = "Get all tasks by filter",
+            tags = {"filter"}
+    )
+    @GetMapping("/filter")
+    public TaskResponseList filterBy(TaskFilter filter) {
+        log.info("filterBy() is called");
 
         return taskMapper.taskListToResponseList(
-                taskService.findByAuthor(userService.findById(userId)));
+                taskService.filterBy(filter));
     }
 
-    @GetMapping("/performer/{userId}")
-    public TaskResponseList getAllByPerformer(@PathVariable Long userId) {
-        log.info("getAllByPerformer() is called");
 
-        return taskMapper.taskListToResponseList(
-                taskService.findByPerformer(userService.findById(userId)));
-    }
 
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "create task",
+                    content = {
+                            @Content(schema = @Schema(implementation = TaskResponse.class),
+                                    mediaType = "application/json")
+                    }),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "some parameter is not found in DB",
+                    content = {
+                            @Content(schema = @Schema(implementation = String.class),
+                                    mediaType = "string")
+                    }),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "some parameter is not valid",
+                    content = {
+                            @Content(schema = @Schema(implementation = String.class),
+                                    mediaType = "string")
+                    })
+    })
     @PostMapping
     public TaskResponse create(@Valid @RequestBody TaskRequest request, @AuthenticationPrincipal UserDetails userDetails) {
         log.info("create() is called");
@@ -71,59 +127,104 @@ public class TaskController {
                 taskService.create(task));
     }
 
+    @Tag(name = "id")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "update task",
+                    content = {
+                            @Content(schema = @Schema(implementation = TaskResponse.class),
+                                    mediaType = "application/json")
+                    }),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "some parameter is not found in DB",
+                    content = {
+                            @Content(schema = @Schema(implementation = String.class),
+                                    mediaType = "string")
+                    }),
+            @ApiResponse(
+                    responseCode = "400", description = "some parameter is not valid",
+                    content = {
+                            @Content(schema = @Schema(implementation = String.class),
+                                    mediaType = "string")
+                    })
+    })
     @PutMapping("/{id}")
     public TaskResponse update(@Valid @RequestBody TaskRequest request, @PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) throws IllegalAccessException {
         log.info("update() is called");
 
-        if(!isAuthor(id, userDetails)) {
+        if(isNotAuthor(id, userDetails)) {
             throw new IllegalAccessException("Внести изменения в задачу может только ее автор");
-        };
+        }
 
         return taskMapper.taskToResponse(
                 taskService.update(
                         taskMapper.requestToTask(request, id)));
     }
 
+    @Tag(name = "id")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "change status",
+                    content = {
+                            @Content(schema = @Schema(implementation = TaskResponse.class),
+                                    mediaType = "application/json")
+                    }),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "parameter is not valid",
+                    content = {
+                            @Content(schema = @Schema(implementation = String.class),
+                                    mediaType = "string")
+                    })
+    })
     @PatchMapping("/{id}/{newStatus}")
     public TaskResponse changeStatus(@PathVariable Long id, @PathVariable String newStatus, @AuthenticationPrincipal UserDetails userDetails) throws IllegalAccessException {
         log.info("changeStatus() is called");
 
-        if(!isAuthor(id, userDetails) && !isPerformer(id, userDetails)) {
+        if(isNotAuthor(id, userDetails) && isNotPerformer(id, userDetails)) {
             throw new IllegalAccessException("Изменить статус задачи может только ее автор или исполнитель");
-        };
+        }
 
         return taskMapper.taskToResponse(
                 taskService.changeStatus(id, newStatus));
     }
 
+    @Operation(
+            summary = "delete task",
+            description = "delete task by id",
+            tags = {"id"}
+    )
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) throws IllegalAccessException {
         log.info("delete() is called");
 
-        if(!isAuthor(id, userDetails)) {
+        if(isNotAuthor(id, userDetails)) {
             throw new IllegalAccessException("Удалить задачу может только ее автор");
-        };
+        }
 
         taskService.deleteById(id);
     }
 
 
 
-    private boolean isAuthor(Long id, UserDetails userDetails){
+    private boolean isNotAuthor(Long id, UserDetails userDetails){
         log.info("isAuthor() is called");
 
         Long userId = userService.findByUsername(userDetails.getUsername()).getId();
         Long authorId = taskService.findById(id).getAuthor().getId();
 
-        return Objects.equals(userId, authorId);
+        return !Objects.equals(userId, authorId);
     }
 
-    private boolean isPerformer(Long id, UserDetails userDetails){
+    private boolean isNotPerformer(Long id, UserDetails userDetails){
         log.info("isPerformer() is called");
 
         Long userId = userService.findByUsername(userDetails.getUsername()).getId();
         Long performerId = taskService.findById(id).getPerformer().getId();
 
-        return Objects.equals(userId, performerId);
+        return !Objects.equals(userId, performerId);
     }
 }

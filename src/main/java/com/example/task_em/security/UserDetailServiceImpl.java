@@ -1,15 +1,12 @@
 package com.example.task_em.security;
 
 import com.example.task_em.entity.User;
-import com.example.task_em.repository.UserRepository;
 import com.example.task_em.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.text.MessageFormat;
 
 @Service
 @RequiredArgsConstructor

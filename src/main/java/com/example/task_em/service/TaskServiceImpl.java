@@ -3,11 +3,15 @@ package com.example.task_em.service;
 import com.example.task_em.entity.Status;
 import com.example.task_em.entity.Task;
 import com.example.task_em.entity.User;
+import com.example.task_em.filter.TaskFilter;
+import com.example.task_em.filter.TaskSpecification;
 import com.example.task_em.repository.TaskRepository;
 import com.example.task_em.utils.BeanUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
@@ -41,18 +45,26 @@ public class TaskServiceImpl implements TaskService{
     }
 
     @Override
-    public List<Task> findByAuthor(User author) {
-        log.info(MessageFormat.format("findByAuthorId() is called with userId = {0}", author.getId()));
-
-        return taskRepository.findByAuthor(author);
+    public List<Task> filterBy(TaskFilter filter) {
+        return taskRepository.findAll(
+                TaskSpecification.withFilter(filter),
+                PageRequest.of(filter.getPageNumber(), filter.getPageSize()))
+                .getContent();
     }
 
-    @Override
-    public List<Task> findByPerformer(User performer) {
-        log.info(MessageFormat.format("findByPerformerId()) is called with ID = {0}", performer.getId()));
-
-        return taskRepository.findByPerformer(performer);
-    }
+//    @Override
+//    public List<Task> findByAuthor(User author) {
+//        log.info(MessageFormat.format("findByAuthorId() is called with userId = {0}", author.getId()));
+//
+//        return taskRepository.findByAuthor(author);
+//    }
+//
+//    @Override
+//    public List<Task> findByPerformer(User performer) {
+//        log.info(MessageFormat.format("findByPerformerId()) is called with ID = {0}", performer.getId()));
+//
+//        return taskRepository.findByPerformer(performer);
+//    }
 
     @Override
     public Task create(Task task) {

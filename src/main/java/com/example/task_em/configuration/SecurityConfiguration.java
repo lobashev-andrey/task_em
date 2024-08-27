@@ -17,7 +17,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableMethodSecurity
@@ -54,11 +53,12 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(
                         (auth) -> auth
-                                .requestMatchers("/account/**").permitAll()
-                                .requestMatchers("/user/**").hasAuthority("ROLE_USER")
-                                .requestMatchers("/task/**").hasAuthority("ROLE_USER")
-                                .requestMatchers("/comment/**").hasAuthority("ROLE_USER")
-                                .anyRequest().authenticated()
+//                                .requestMatchers("/account/**").permitAll()
+                                .requestMatchers("/**").permitAll()
+//                                .requestMatchers("/user/**").hasAuthority("ROLE_USER")
+//                                .requestMatchers("/task/**").hasAuthority("ROLE_USER")
+//                                .requestMatchers("/comment/**").hasAuthority("ROLE_USER")
+//                                .anyRequest().authenticated()
                 )
 //                .exceptionHandling(configurer -> configurer.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .csrf(AbstractHttpConfigurer::disable)

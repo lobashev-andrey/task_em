@@ -1,7 +1,6 @@
 package com.example.task_em.dto;
 
-import com.example.task_em.entity.Priority;
-import com.example.task_em.entity.Status;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;

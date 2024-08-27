@@ -5,7 +5,6 @@ import com.example.task_em.dto.CommentResponse;
 import com.example.task_em.dto.CommentResponseList;
 import com.example.task_em.entity.Comment;
 import com.example.task_em.service.TaskService;
-import com.example.task_em.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

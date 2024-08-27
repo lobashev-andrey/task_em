@@ -2,6 +2,7 @@ package com.example.task_em.service;
 
 import com.example.task_em.entity.Task;
 import com.example.task_em.entity.User;
+import com.example.task_em.filter.TaskFilter;
 
 import java.util.List;
 
@@ -11,9 +12,11 @@ public interface TaskService {
 
     Task findById(Long id);
 
-    List<Task> findByAuthor(User author);
+    List<Task> filterBy(TaskFilter filter);
 
-    List<Task> findByPerformer(User performer);
+//    List<Task> findByAuthor(User author);
+//
+//    List<Task> findByPerformer(User performer);
 
     Task create(Task task);
 
