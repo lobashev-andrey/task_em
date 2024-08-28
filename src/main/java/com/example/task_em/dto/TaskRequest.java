@@ -1,6 +1,5 @@
 package com.example.task_em.dto;
 
-import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;

@@ -32,43 +32,40 @@ public class SecurityService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public AuthResponse authenticateUser(LoginRequest loginRequest) {     // отвечает за логин пользователя и занесение его в контекст Spring Security
-        // а также за отдачу access- и refresh-токена клиенту
+    public AuthResponse authenticateUser(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager
                 .authenticate(
-                        new UsernamePasswordAuthenticationToken(  // выполняем аутентификацию
-                                loginRequest.getUsername(),                                                                          // проверяя входные данные на имеющиеся в системе
+                        new UsernamePasswordAuthenticationToken(
+                                loginRequest.getUsername(),
                                 loginRequest.getPassword()
                         ));
 
-        System.out.println("************* authenticateUser " + loginRequest.getUsername() + " " + loginRequest.getPassword());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);   // если успешно, то результат заносится в SCH, который управляет данными текущего потока
-
-        AppUserDetails userDetails = (AppUserDetails) authentication.getPrincipal();  // получаем детали идентифицированного пользователя
+        AppUserDetails userDetails = (AppUserDetails) authentication.getPrincipal();
 
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());  // создаем новый рефреш-токен
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
 
-        return AuthResponse.builder()                            // и возвращаем респонс с информацией о об аутентификации и данных пользователя
+        return AuthResponse.builder()
                 .id(userDetails.getId())
-                .token(jwtUtils.generateJwtToken(userDetails))   // в том числе токен доступа  и
-                .refreshToken(refreshToken.getToken())           //             токен обновления
+                .token(jwtUtils.generateJwtToken(userDetails))
+                .refreshToken(refreshToken.getToken())
                 .username(userDetails.getUsername())
                 .email(userDetails.getEmail())
                 .roles(roles)
                 .build();
     }
 
-    public void register(CreateUserRequest createUserRequest) {    // сохранение пользователя в БД
+    public void register(CreateUserRequest createUserRequest) {
         var user = User.builder()
                 .username(createUserRequest.getUsername())
                 .email(createUserRequest.getEmail())
-                .password(passwordEncoder.encode(createUserRequest.getPassword()))   // !  пароль кодируем
-                .roles(createUserRequest.getRoles())            // почему-то он в отдельную строку вынес  ??????????????
+                .password(passwordEncoder.encode(createUserRequest.getPassword()))
+                .roles(createUserRequest.getRoles())
                 .build();
         userRepository.save(user);
     }
@@ -76,23 +73,23 @@ public class SecurityService {
     public RefreshTokenResponse refreshToken(RefreshTokenRequest request) {
         String requestRefreshToken = request.getRefreshToken();
 
-        return refreshTokenService.findByRefreshToken(requestRefreshToken)       // ищем токен в redis
-                .map(refreshTokenService::checkRefreshToken)                     // проверяем валидность
-                .map(RefreshToken::getUser_id)                                    // ищем пользователя и генерируем для него новые:
+        return refreshTokenService.findByRefreshToken(requestRefreshToken)
+                .map(refreshTokenService::checkRefreshToken)
+                .map(RefreshToken::getUserId)
                 .map(userId ->
                         {
                             User tokenOwner = userRepository.findById(userId).orElseThrow(() ->
                                     new RefreshTokenException("Exception trying to get token for userId: " + userId));
-                            String token = jwtUtils.generateTokenFromUsername(tokenOwner.getUsername());                     // access-токен
+                            String token = jwtUtils.generateTokenFromUsername(tokenOwner.getUsername());
 
                             return new RefreshTokenResponse(token,
-                                    refreshTokenService.createRefreshToken(userId).getToken());                              // refresh-токен
-                        }                                                                                                    // и возвращаем их ему
+                                    refreshTokenService.createRefreshToken(userId).getToken());
+                        }
                 )
                 .orElseThrow(() -> new RefreshTokenException(requestRefreshToken, "Refresh token not found"));
     }
 
-    public void logout() {                                                                                 // просто удаление рефреш-токена
+    public void logout() {
         var currentPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (currentPrincipal instanceof AppUserDetails userDetails) {
             Long userId = userDetails.getId();

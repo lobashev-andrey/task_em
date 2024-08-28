@@ -2,7 +2,6 @@ package com.example.task_em.service;
 
 import com.example.task_em.entity.Status;
 import com.example.task_em.entity.Task;
-import com.example.task_em.entity.User;
 import com.example.task_em.filter.TaskFilter;
 import com.example.task_em.filter.TaskSpecification;
 import com.example.task_em.repository.TaskRepository;
@@ -11,7 +10,6 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
@@ -28,15 +26,6 @@ public class TaskServiceImpl implements TaskService{
         this.taskRepository = taskRepository;
     }
 
-
-
-    @Override
-    public List<Task> findAll() {
-        log.info("findAll() is called");
-
-        return taskRepository.findAll();
-    }
-
     @Override
     public Task findById(Long id) {
         log.info(MessageFormat.format("findById()) is called with ID = {0}", id));
@@ -51,20 +40,6 @@ public class TaskServiceImpl implements TaskService{
                 PageRequest.of(filter.getPageNumber(), filter.getPageSize()))
                 .getContent();
     }
-
-//    @Override
-//    public List<Task> findByAuthor(User author) {
-//        log.info(MessageFormat.format("findByAuthorId() is called with userId = {0}", author.getId()));
-//
-//        return taskRepository.findByAuthor(author);
-//    }
-//
-//    @Override
-//    public List<Task> findByPerformer(User performer) {
-//        log.info(MessageFormat.format("findByPerformerId()) is called with ID = {0}", performer.getId()));
-//
-//        return taskRepository.findByPerformer(performer);
-//    }
 
     @Override
     public Task create(Task task) {

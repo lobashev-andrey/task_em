@@ -24,9 +24,9 @@ public class UserMapper {
         return new UserResponse(
                 user.getId(),
                 user.getUsername(),
-                user.getEmail(),
-                user.getPassword(),
-                user.getRoles().stream().toList().get(0).name()
+                user.getEmail()
+//               , user.getPassword(),
+//                user.getRoles().stream().toList().get(0).name()
         );
     }
 

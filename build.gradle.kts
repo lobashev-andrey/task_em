@@ -39,6 +39,7 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
+	testImplementation("net.javacrumbs.json-unit:json-unit:2.38.0")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

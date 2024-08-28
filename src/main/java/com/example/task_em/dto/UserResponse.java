@@ -17,7 +17,7 @@ public class UserResponse {
 
 
 
-    private String password;
-
-    private String roles;
+//    private String password;
+//
+//    private String roles;
 }

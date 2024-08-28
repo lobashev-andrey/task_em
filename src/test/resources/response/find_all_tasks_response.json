@@ -1,0 +1,41 @@
+{
+  "tasks":[
+    {
+      "id": 1,
+      "title": "title1",
+      "description": "description1",
+      "status": "в_ожидании",
+      "priority": "средний",
+      "authorId": 1,
+      "performerId": 2,
+      "comments":{
+        "comments":[
+          {
+            "id": 1,
+            "userId": 1,
+            "taskId": 1,
+            "text": "some_long_text"
+          },
+          {
+            "id": 2,
+            "userId": 2,
+            "taskId": 1,
+            "text": "another_long_text"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "title": "title2",
+      "description": "description2",
+      "status": "в_ожидании",
+      "priority": "средний",
+      "authorId": 2,
+      "performerId": 1,
+      "comments":{
+        "comments":[]
+      }
+    }
+  ]
+}

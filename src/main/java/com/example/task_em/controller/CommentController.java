@@ -3,7 +3,6 @@ package com.example.task_em.controller;
 import com.example.task_em.dto.CommentRequest;
 import com.example.task_em.dto.CommentResponse;
 import com.example.task_em.dto.CommentResponseList;
-import com.example.task_em.dto.TaskResponse;
 import com.example.task_em.entity.Comment;
 import com.example.task_em.mapper.CommentMapper;
 import com.example.task_em.service.CommentService;

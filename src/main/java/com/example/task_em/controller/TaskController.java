@@ -46,7 +46,7 @@ public class TaskController {
             tags = "filter"
     )
     @GetMapping
-    public TaskResponseList getAll(TaskFilter filter) {
+    public TaskResponseList findAll(TaskFilter filter) {
         log.info("getAllTasks()  is called");
 
         return filterBy(filter);
@@ -70,7 +70,7 @@ public class TaskController {
                     })
     })
     @GetMapping("/{id}")
-    public TaskResponse getById(@PathVariable Long id) {
+    public TaskResponse findById(@PathVariable Long id) {
         log.info("getTaskById() is called");
 
         return taskMapper.taskToResponse(

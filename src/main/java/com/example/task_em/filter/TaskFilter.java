@@ -1,8 +1,5 @@
 package com.example.task_em.filter;
 
-import com.example.task_em.entity.Priority;
-import com.example.task_em.entity.Status;
-import com.example.task_em.entity.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
